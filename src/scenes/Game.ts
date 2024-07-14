@@ -10,6 +10,8 @@ import {
 import { getRandomReel } from "../random/reel";
 import { makeSymbolSprite } from "../utils/makeSymbolSprite";
 import { Symbols } from "../enums/symbols";
+import { getWinnings } from "../utils/getWinnings";
+import { symbolMap } from "../config/symbolMap";
 
 export class Game extends Scene {
   camera: Phaser.Cameras.Scene2D.Camera;
@@ -23,6 +25,7 @@ export class Game extends Scene {
   betAmount: number;
   spin: boolean;
   balanceText: Phaser.GameObjects.Text;
+  isSpinning: boolean;
 
   constructor() {
     super("Game");
@@ -31,6 +34,7 @@ export class Game extends Scene {
     this.betAmount = 15;
     this.winnings = 0;
     this.spin = false;
+    this.isSpinning = false;
   }
 
   init() {
@@ -96,6 +100,7 @@ export class Game extends Scene {
       reel.setMask(this.mask);
 
       if (spin) {
+        // Drops the symbols
         this.tweens.add({
           targets: reel,
           y: finalY,
@@ -140,9 +145,12 @@ export class Game extends Scene {
       );
 
       graphics.on("pointerdown", () => {
-        this.spin = true;
-        this.balance -= this.betAmount;
-        this.scene.start("Game"); // Restart to spin
+        if (!this.isSpinning) {
+          this.spin = true;
+          this.balance -= this.betAmount;
+          this.isSpinning = true;
+          this.scene.start("Game"); // Restart to spin
+        }
       });
 
       this.msg_text = this.add.text(
@@ -208,18 +216,29 @@ export class Game extends Scene {
 
     this.makeReels(this.spin);
 
-    // if (this.spin) {
-    //   this.time.delayedCall(300 + 150 * (reelsCount - 1), () => {
-    //     const text = this.add.text(centerX, centerY, "Spin Finished!", {
-    //       fontFamily: "Arial Black",
-    //       fontSize: 38,
-    //       color: "#ffffff",
-    //       stroke: "#000000",
-    //       strokeThickness: 8,
-    //       align: "center",
-    //     });
-    //     text.setOrigin(0.5);
-    //   });
-    // }
+    if (this.spin) {
+      this.time.delayedCall(300 + 150 * (reelsCount - 1), () => {
+        this.isSpinning = false;
+        const { winnings: winningsAmount, highlights } = getWinnings(
+          this.reelsData,
+          this.betAmount,
+        );
+
+        if (winningsAmount > 0) {
+          this.balance += this.betAmount + winningsAmount;
+          this.balanceText.setText(`Balance: ${this.balance} USD`);
+          this.winnings += winningsAmount;
+          winnings.setText(`Winnings: ${this.winnings} USD`);
+        }
+
+        for (const [row, col] of highlights) {
+          const sprite = this.reels[col].getAt(
+            row,
+          ) as Phaser.GameObjects.Sprite;
+
+          sprite.setTexture(symbolMap[sprite.texture.key as Symbols]);
+        }
+      });
+    }
   }
 }
