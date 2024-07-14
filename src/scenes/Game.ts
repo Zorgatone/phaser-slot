@@ -26,6 +26,8 @@ export class Game extends Scene {
   spin: boolean;
   balanceText: Phaser.GameObjects.Text;
   isSpinning: boolean;
+  winRectangle: Phaser.GameObjects.Rectangle;
+  winText: Phaser.GameObjects.Text;
 
   constructor() {
     super("Game");
@@ -149,6 +151,12 @@ export class Game extends Scene {
           this.spin = true;
           this.balance -= this.betAmount;
           this.isSpinning = true;
+          if (this.winRectangle) {
+            this.winRectangle.destroy();
+          }
+          if (this.winText) {
+            this.winText.destroy();
+          }
           this.scene.start("Game"); // Restart to spin
         }
       });
@@ -237,6 +245,44 @@ export class Game extends Scene {
           ) as Phaser.GameObjects.Sprite;
 
           sprite.setTexture(symbolMap[sprite.texture.key as Symbols]);
+        }
+
+        const winningsBox = {
+          width: 600,
+          height: 90,
+          x: centerX,
+          y: centerY,
+        };
+
+        if (winningsAmount > 0) {
+          this.winRectangle = this.add.rectangle(
+            winningsBox.x,
+            winningsBox.y,
+            winningsBox.width,
+            winningsBox.height,
+            0xffff00,
+            0.5,
+          );
+
+          this.winText = this.add.text(
+            winningsBox.x,
+            winningsBox.y,
+            `You won ${winningsAmount} USD!`,
+            {
+              fontFamily: "Arial Black",
+              fontSize: 48,
+              color: "#ffffff",
+              stroke: "#000000",
+              strokeThickness: 8,
+              align: "center",
+            },
+          );
+          this.winText.setOrigin(0.5);
+
+          this.time.delayedCall(2000, () => {
+            this.winText.destroy();
+            this.winRectangle.destroy();
+          });
         }
       });
     }
