@@ -19,12 +19,17 @@ export class Game extends Scene {
   reels: Phaser.GameObjects.Container[];
   mask: Phaser.Display.Masks.GeometryMask;
   balance: number;
+  winnings: number;
+  betAmount: number;
   spin: boolean;
+  balanceText: Phaser.GameObjects.Text;
 
   constructor() {
     super("Game");
 
     this.balance = 123456789;
+    this.betAmount = 15;
+    this.winnings = 0;
     this.spin = false;
   }
 
@@ -112,36 +117,54 @@ export class Game extends Scene {
     this.camera.setBackgroundColor(0x333333);
 
     const button = {
-      x: centerX - 200,
+      x: centerX - 100,
       y: centerY + boardSize.height / 2 + 30,
-      width: 400,
+      width: 200,
       height: 60,
     };
 
-    const graphics = this.add.graphics();
-    graphics.fillStyle(0x339933, 1);
-    graphics.fillRoundedRect(
-      button.x,
-      button.y,
-      button.width,
-      button.height,
-      20,
-    );
+    if (this.balance >= this.betAmount) {
+      const graphics = this.add.graphics();
+      graphics.fillStyle(0x339933, 1);
+      graphics.fillRoundedRect(
+        button.x,
+        button.y,
+        button.width,
+        button.height,
+        20,
+      );
 
-    graphics.setInteractive(
-      new Geom.Rectangle(button.x, button.y, button.width, button.height),
-      Geom.Rectangle.Contains,
-    );
+      graphics.setInteractive(
+        new Geom.Rectangle(button.x, button.y, button.width, button.height),
+        Geom.Rectangle.Contains,
+      );
 
-    graphics.on("pointerdown", () => {
-      this.spin = true;
-      this.scene.start("Game"); // Restart to spin
-    });
+      graphics.on("pointerdown", () => {
+        this.spin = true;
+        this.balance -= this.betAmount;
+        this.scene.start("Game"); // Restart to spin
+      });
 
-    this.msg_text = this.add.text(
-      button.x + button.width / 2,
-      button.y + button.height / 2,
-      "Spin",
+      this.msg_text = this.add.text(
+        button.x + button.width / 2,
+        button.y + button.height / 2,
+        "Spin",
+        {
+          fontFamily: "Arial Black",
+          fontSize: 38,
+          color: "#ffffff",
+          stroke: "#000000",
+          strokeThickness: 8,
+          align: "center",
+        },
+      );
+      this.msg_text.setOrigin(0.5);
+    }
+
+    this.balanceText = this.add.text(
+      centerX,
+      centerY - boardSize.height / 2 - 60,
+      `Balance: ${this.balance} USD`,
       {
         fontFamily: "Arial Black",
         fontSize: 38,
@@ -151,7 +174,37 @@ export class Game extends Scene {
         align: "center",
       },
     );
-    this.msg_text.setOrigin(0.5);
+    this.balanceText.setOrigin(0.5);
+
+    const betAmount = this.add.text(
+      centerX - boardSize.width / 2 - 60,
+      centerY + boardSize.height / 2 + 60,
+      `Bet amount: ${this.betAmount} USD`,
+      {
+        fontFamily: "Arial Black",
+        fontSize: 24,
+        color: "#ffffff",
+        stroke: "#000000",
+        strokeThickness: 8,
+        align: "center",
+      },
+    );
+    betAmount.setOrigin(0, 0.5);
+
+    const winnings = this.add.text(
+      centerX + boardSize.width / 2 + 60,
+      centerY + boardSize.height / 2 + 60,
+      `Winnings: ${this.winnings} USD`,
+      {
+        fontFamily: "Arial Black",
+        fontSize: 24,
+        color: "#ffffff",
+        stroke: "#000000",
+        strokeThickness: 8,
+        align: "center",
+      },
+    );
+    winnings.setOrigin(1, 0.5);
 
     this.makeReels(this.spin);
 
