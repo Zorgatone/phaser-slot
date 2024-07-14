@@ -1,7 +1,6 @@
 import { Scene, GameObjects } from "phaser";
 
 export class MainMenu extends Scene {
-  background: GameObjects.Image;
   logo: GameObjects.Image;
   title: GameObjects.Text;
 
@@ -10,12 +9,8 @@ export class MainMenu extends Scene {
   }
 
   create() {
-    this.background = this.add.image(512, 384, "background");
-
-    this.logo = this.add.image(512, 300, "logo");
-
     this.title = this.add
-      .text(512, 460, "Main Menu", {
+      .text(512, 460, "Start Playing!", {
         fontFamily: "Arial Black",
         fontSize: 38,
         color: "#ffffff",
