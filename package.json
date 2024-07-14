@@ -1,0 +1,30 @@
+{
+    "name": "phaser-slot",
+    "description": "A slot game using Phaser",
+    "version": "0.0.1",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Zorgatone/phaser-slot.git"
+    },
+    "author": "Tommaso Ricci <zorgatone@gmail.com>",
+    "license": "UNLICENSED",
+    "private": true,
+    "homepage": "https://github.com/Zorgatone/phaser-slot",
+    "scripts": {
+        "dev": "vite --config vite/config.dev.mjs",
+        "build": "vite build --config vite/config.prod.mjs"
+    },
+    "devDependencies": {
+        "prettier": "3.3.3",
+        "terser": "^5.31.0",
+        "typescript": "^5.4.5",
+        "vite": "^5.3.1"
+    },
+    "dependencies": {
+        "phaser": "^3.80.1"
+    },
+    "volta": {
+        "node": "22.4.1",
+        "npm": "10.8.1"
+    }
+}
