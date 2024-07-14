@@ -1,5 +1,7 @@
 import { Scene } from "phaser";
 
+import { images } from "../config/images";
+
 export class Preloader extends Scene {
   constructor() {
     super("Preloader");
@@ -21,7 +23,11 @@ export class Preloader extends Scene {
 
   preload() {
     //  Load the assets for the game - Replace with your own assets
-    this.load.setPath("assets");
+    this.load.setPath("assets/symbols");
+
+    for (const image of images) {
+      this.load.image(image.key, image.file);
+    }
   }
 
   create() {
